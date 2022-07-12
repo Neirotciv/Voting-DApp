@@ -28,3 +28,14 @@ table{
   margin: 0 auto;
   border: solid 10px rgb(209, 100, 122);
 }
+
+/* My components tests */
+.add-voter {
+  width: 250px;
+  margin: 20px;
+  padding: 10px;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
