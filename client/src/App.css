@@ -30,12 +30,12 @@ table{
 }
 
 /* My components tests */
-.add-voter {
-  width: 250px;
+.container {
+  width: 400px;
   margin: 20px;
   padding: 10px;
-  border: 1px solid black;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border: 1px solid black;
 }
