@@ -31,6 +31,7 @@ table{
 
 /* My components tests */
 .container {
+  background-color: #7cdecb;
   width: 400px;
   margin: 20px;
   padding: 10px;

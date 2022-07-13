@@ -13,6 +13,12 @@ function Voter(props) {
         element.value = "";
     }
 
+    function addProposal() {
+        const element = document.getElementById("proposal-description");
+        const description = element.value;
+        contract.methods.addProposal(description).call({ from: account });
+    }
+
     console.log(contract);
 
     return (
@@ -27,6 +33,12 @@ function Voter(props) {
                     <input id="voter-address" type="text" placeholder="0x..." />
                     <button onClick={getVoterFromAddress}>Validate</button>
                 </div>
+            </div>
+
+            <div className="container">
+                <h3>You're proposal</h3>
+                <input id="proposal-description" type="text" placeholder="Description..." />
+                <button onClick={addProposal}>Validate</button>
             </div>
         </div>
     )
