@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import VotingContract from "./contracts/Voting.json";
 import getWeb3 from "./scripts/getWeb3";
-import Voter from "./components/Voter";
-import Owner from "./components/Owner";
+// import Voter from "./components/Voter";
+// import Owner from "./components/Owner";
 
 import "./App.css";
 
@@ -11,6 +11,7 @@ function App() {
     const [accounts, setAccounts] = useState(null);
     const [contract, setContract] = useState(null);
     const [owner, setOwner] = useState(null);
+    const [isOwner, setIsOwner] = useState(false)
 
     useEffect(() => {
         async function setUpWeb3() {
@@ -23,13 +24,15 @@ function App() {
                     VotingContract.abi,
                     deployedNetwork && deployedNetwork.address
                 );
-                const owner = await instance.methods.owner().call();
-                
-                setWeb3(web3Provider);
-                setAccounts(accounts);
-                setContract(instance);
-                setOwner(owner);
+                const contractOwner = await instance.methods.owner().call();
 
+                setWeb3(web3Provider);
+                setContract(instance);
+                setAccounts(accounts);
+                setOwner(contractOwner);
+                
+                if (accounts[0] === contractOwner) { setIsOwner(true) }
+                
             } catch (error) {
                 alert("Failed to load web3, accounts, or contract. Check console for details");
                 console.error(error);
@@ -39,20 +42,41 @@ function App() {
         setUpWeb3();
     },[]);
 
+    // ----------- WORKFLOW STATUS -----------
+
     // ----------- FUNCTIONS -----------
 
-    // ----------- RETURN -----------
+    // ----------- COMPONENTS -----------
+    
+    function Owner() {
+        return (
+            <div>
+                <h1>Owner</h1>
+            </div>
+        )
+    }
 
-    if (!web3) {
+    function Voter() {
+        return (
+            <div>
+                <h1>Voter</h1>
+            </div>
+        )
+    }
+
+    function UserDashboard(props) {
+        if (props.isOwner) {
+            return <Owner />;
+        }
+        return <Voter />;
+    }
+
+    if (!web3 && !contract) {
         return <div>Loading Web3, accounts, and contract...</div>;
     }
 
-    if (accounts == owner) {
-        return <Owner owner={owner} contract={contract}/>
-    } 
-    
     return (
-        <Voter />
+        <UserDashboard isOwner={isOwner}/>
     )
 }
 

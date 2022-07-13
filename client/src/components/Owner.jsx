@@ -5,6 +5,7 @@ function Owner(props) {
     const [contract] = useState(props.contract);
     const [owner] = useState(props.owner);
     const [event, setEvent] = useState(null);
+    const [myArray, setMyArray] = useState(["value1", "value2", "value3", "value4"]);
 
     async function addNewVoter() {
         const element = document.getElementById("new-voter-address");
@@ -21,6 +22,22 @@ function Owner(props) {
         element.value = "";
     }
 
+    async function getProposalsEvent() {
+        await contract.getPastEvents('ProposalRegistered', {
+            fromBlock: 0,
+            toBlock: "latest"
+        }).then((error, events) => {
+            console.log(events);
+        });
+    }
+
+    // Test function
+    function addValuesInArray() {
+        let values = ["value1", "value2", "value3", "value4"]
+        setMyArray(values);
+        console.log(myArray);
+    }
+
     return (
         <div>
             <WorkflowStatus contract={contract} address={owner}/>
@@ -32,6 +49,10 @@ function Owner(props) {
                 <li>0xB0201641d9b936eB20155a38439Ae6AB07d85Fbd</li>
             </ul>
 
+            <ul>
+                {myArray.map((value, index) => <li key={index}>{value}</li>)}
+            </ul>
+
             <div className="container">
                 <h3>Add new voter</h3>
                 <div>
@@ -40,6 +61,8 @@ function Owner(props) {
                 </div>
                 { event != null ? <p>Address {event} added</p> : null }
             </div>
+                <button onClick={getProposalsEvent}>Proposal event console</button>
+                <button onClick={addValuesInArray}>Add values</button>
         </div>
     )
 }

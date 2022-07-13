@@ -1,31 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function Voter(props) {
-    const [account] = useState(props.account)
-    const [contract] = useState(props.contract)
-    const [contractAddress] = useState(null)
+    const [account] = useState(props.account);
+    const [contract, setContract] = useState(null);
+    const [contractAddress, setContractAddress] = useState(null);
 
-    function getVoterFromAddress() {
+    useEffect(() => {
+        setContract(props.myContract);
+        if (contract) {
+            setContractAddress(contract.options.address);
+        }
+    });
+
+    async function getVoterFromAddress() {
         const element = document.getElementById("voter-address");
         const voterAddress = element.value;
-        contract.methods.getVoter(voterAddress).call({ from: account });
-        console.log(voterAddress);
+        const transaction = await contract.methods.getVoter(voterAddress).call({ from: account });
         element.value = "";
     }
 
-    function addProposal() {
+    async function addProposal() {
         const element = document.getElementById("proposal-description");
         const description = element.value;
-        contract.methods.addProposal(description).call({ from: account });
+        await contract.methods.addProposal(description).send({ from: account[0] });
     }
-
-    console.log(contract);
 
     return (
         <div>
-            <h1>Voting DApp</h1>
+            <h1>Voting DApp, contract {contractAddress}</h1>
             <h2>Your address is {account}</h2>
-            <h2>Contract address is {contractAddress}</h2>
+            <div className="container">
+
+            </div>
 
             <div className="container">
                 <h3>Get voter</h3>
