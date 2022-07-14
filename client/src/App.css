@@ -30,6 +30,11 @@ table{
 }
 
 /* My components tests */
+
+body {
+  background-color: #516489;
+}
+
 .container {
   background-color: #7cdecb;
   width: 400px;
