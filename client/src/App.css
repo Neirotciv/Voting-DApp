@@ -32,6 +32,7 @@ table{
 /* My components tests */
 
 body {
+  color: white;
   background-color: #516489;
 }
 
@@ -44,4 +45,10 @@ body {
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid black;
+}
+
+.header {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px;
 }

@@ -176,4 +176,10 @@ contract Voting is Ownable {
         workflowStatus = WorkflowStatus.VotesTallied;
         emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded, WorkflowStatus.VotesTallied);
     }
+
+    // function startVoterRegistering() external onlyOwner {
+    //     require(workflowStatus == WorkflowStatus.VotingSessionEnded, 'Voting session havent ended yet');
+    //     workflowStatus = WorkflowStatus.RegisteringVoters;
+    //     emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded, WorkflowStatus.RegisteringVoters);
+    // }
 }
