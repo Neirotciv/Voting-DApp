@@ -15,14 +15,15 @@ function WorkflowStatus(props) {
     const contract = useContext(ContractContext);
 
     useEffect(() => {
-        async function updateStatus() {
-            if (contract) {
-                const statusId = await contract.methods.workflowStatus().call({ from: props.userAccount });
-                stringStatusFromId(statusId)
-            }
-        }
         updateStatus();
-    },[contract, props.userAccount]);
+    },[]);
+
+    async function updateStatus() {
+        if (contract) {
+            const statusId = await contract.methods.workflowStatus().call({ from: props.userAccount });
+            stringStatusFromId(statusId)
+        }
+    }
 
     function stringStatusFromId(id) {
         switch (id) {
@@ -49,7 +50,7 @@ function WorkflowStatus(props) {
         }
     }
 
-    // window.onload = updateStatus();
+    window.onload = updateStatus();
     
     return (
         <div>
@@ -225,16 +226,47 @@ function Owner(props) {
 
 function Voter(props) {
     const [isRegistered, setIsRegistered] = useState(false);
+    const [votedProposalId, setVotedProposalId] = useState(false);
+    const [workflowStatus, setworkflowStatus] = useState(0);
+    const [event, setEvent] = useState(null);
     const contract = useContext(ContractContext);
 
     useEffect(() => {
         checkIfUserIsRegistered();
-    },[])
+        checkWorkflowStatus();
+    },[]);
 
+    // if (isRegistered) {
+    //     let options = {
+    //         fromBlock: 0,
+    //     }
+
+    //     contract.events.WorkflowStatusChange(options)
+    //         .on('data', event => console.log("event", event))
+    //         .on('changed', changed => console.log("changed", changed));
+    // }
+
+    // Je veux vérifier si user est registered
+    
+    contract.events.VoterRegistered({ fromBlock: "latest" }) 
+        .on('data', event => {
+            if (event.returnValues.voterAddress == props.userAccount) {
+                setIsRegistered(true)
+            }
+        })
+    
+    
     async function checkIfUserIsRegistered() {
         if (contract && props.userAccount) {
-            const transaction = await contract.methods.getVoter(props.userAccount).call({ from: props.userAccount });
-            setIsRegistered(transaction.isRegistered);
+            const user = await contract.methods.getVoter(props.userAccount).call({ from: props.userAccount });
+            setIsRegistered(user.isRegistered);
+        }
+    }
+
+    async function checkWorkflowStatus() {
+        if (contract && props.userAccount) {
+            const status = await contract.methods.workflowStatus().call({ from: props.userAccount });
+            setworkflowStatus(status);
         }
     }
 
@@ -243,20 +275,32 @@ function Voter(props) {
         const description = element.value;
         try {
             const transaction = await contract.methods.addProposal(description).send({ from: props.userAccount });
-            console.log(transaction);
+            const proposalId = transaction.events.ProposalRegistered.returnValues.proposalId;
+            setVotedProposalId(proposalId);
         } catch (error) {
             console.log("add proposal", error)
         }
+    }
+
+    function AddProposal() {
+        if (workflowStatus === "1") {
+            return (
+                <div>
+                    <h3>Add you're proposal</h3>
+                    <input id="proposal-description" type="text" placeholder="Description..." />
+                    <button onClick={addProposal}>Validate</button>
+                    {(event === null ? "" : <p>{event} just recorded</p>)}      
+                </div>
+            )
+        }
+        return <h3>The proposal session is finished or not yet open</h3>
     }
 
     function inputAddProposal() {
         if (isRegistered) {
             return (
                 <div className="container">
-                    <h3>Add you're proposal</h3>
-                    <input id="proposal-description" type="text" placeholder="Description..." />
-                    <button onClick={addProposal}>Validate</button>
-                    {/* {(event === null ? "" : <p>{event} just recorded</p>)} */}
+                    <AddProposal />
                 </div>
             )
         }
@@ -267,14 +311,79 @@ function Voter(props) {
             <WorkflowStatus userAccount={props.userAccount} />
             <h1>Voter - {(isRegistered ? "you are registered" : "you are not registered")}</h1>
             {inputAddProposal()}
+            <Voting userAccount={props.userAccount} />
         </div>
     )
 }
 
-function Voting() {
+function Voting(props) {
+    const contract = useContext(ContractContext);
+    const [warningMessage, setWarningMessage] = useState(null);
+    const [voterAddress, setVoterAddress] = useState(null);
+    const [proposalId, setProposalId] = useState(null);
+
+    async function voteForProposal() {
+        const element = document.getElementById("vote-proposal-id");
+        const id = element.value;
+        try {
+            const transaction = await contract.methods.setVote(id).send({ from: props.userAccount });
+            setVoterAddress(transaction.events.Voted.voter);
+            setProposalId(transaction.events.Voted.proposalId);
+        } catch (error) {
+            console.log("vote for proposal", error)
+        }
+        element.value = "";
+    }
+
+    function Message() {
+        if (voterAddress && proposalId) {
+            return (
+                <p>{voterAddress} has vote for proposal {proposalId}</p>
+            )
+        }
+    }
+
     return (
-        <div>
+        <div className="container">
             <h3>Voting</h3>
+            <input id="vote-proposal-id" type="text" placeholder="Proposal id" />
+            <button onClick={voteForProposal}>Validate</button>
+            <Message />
+        </div>
+    )
+}
+
+// ==================================
+// ---------- Tallied Vote ----------
+// ==================================
+
+function TalliedVote(props) {
+    const [winningId, setWinningId] = useState(null);
+    const [proposal, setProposal] = useState(null);
+    const contract = useContext(ContractContext);
+
+    useEffect(() => {
+        console.log(props.userAccount);
+        if (contract) {
+            getWinningProposal();
+        }
+    },[])
+
+    async function getOneProposal(id) {
+        const proposal = await contract.methods.getOneProposal(id).call({ from: props.userAccount });
+        setProposal(proposal);
+    }
+
+    async function getWinningProposal() {
+        console.log(props.userAccount)
+        const id =  await contract.methods.winningProposalID().call({ from: props.userAccount });
+        setWinningId(id);
+        getOneProposal(id);
+    }
+
+    return (
+        <div className="container">
+            <p>Winning proposal is {proposal} with id {winningId}</p>
         </div>
     )
 }
@@ -327,10 +436,12 @@ function App() {
     },[]);
 
     function UserDashboard(props) {
-        if (isOwner) {
-            return <Owner userAccount={props.userAccount} />;
+        if (props.userAccount) {
+            if (isOwner) {
+                return <Owner userAccount={props.userAccount} />;
+            }
+            return <Voter userAccount={props.userAccount} />;
         }
-        return <Voter userAccount={props.userAccount} />;
     }
 
     if (!web3 && !contract) {

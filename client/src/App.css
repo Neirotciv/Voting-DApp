@@ -36,16 +36,7 @@ body {
   background-color: #516489;
 }
 
-.container {
-  background-color: #7cdecb;
-  width: 400px;
-  margin: 20px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border: 1px solid black;
-}
+
 
 .header {
   display: flex;
