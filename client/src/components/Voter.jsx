@@ -1,52 +1,88 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import Voting from "./Voting";
 
 function Voter(props) {
-    const [account] = useState(props.account);
-    const [contract, setContract] = useState(null);
-    const [contractAddress, setContractAddress] = useState(null);
+    const [isRegistered, setIsRegistered] = useState(false);
+    const [workflowStatus, setworkflowStatus] = useState(0);
+    const [contract, setContract] = useState(props.contract);
+    const [event, setEvent] = useState(null);
 
     useEffect(() => {
-        setContract(props.myContract);
-        if (contract) {
-            setContractAddress(contract.options.address);
-        }
-    });
+        setContract(props.contract);
+        checkIfUserIsRegistered();
+        checkWorkflowStatus();
+    },[props.contract]);
 
-    async function getVoterFromAddress() {
-        const element = document.getElementById("voter-address");
-        const voterAddress = element.value;
-        const transaction = await contract.methods.getVoter(voterAddress).call({ from: account });
-        element.value = "";
+    // Je veux vérifier si user est registered
+    contract.events.VoterRegistered({ fromBlock: "latest" }) 
+        .on('data', event => {
+            if (event.returnValues.voterAddress === props.userAccount) {
+                setIsRegistered(true)
+            }
+        })
+    
+    async function checkIfUserIsRegistered() {
+        if (contract && props.userAccount) {
+            const user = await contract.methods.getVoter(props.userAccount).call({ from: props.userAccount });
+            setIsRegistered(user.isRegistered);
+        }
+    }
+
+    async function checkWorkflowStatus() {
+        if (contract && props.userAccount) {
+            const status = await contract.methods.workflowStatus().call({ from: props.userAccount });
+            setworkflowStatus(status);
+        }
     }
 
     async function addProposal() {
         const element = document.getElementById("proposal-description");
         const description = element.value;
-        await contract.methods.addProposal(description).send({ from: account[0] });
+        try {
+            const transaction = await contract.methods.addProposal(description).send({ from: props.userAccount });
+            const event = transaction.events.VoterRegistered.returnValues.proposalId;
+            setEvent(event);
+        } catch (error) {
+            console.log("add proposal", error)
+        }
+    }
+
+    function AddProposal() {
+        if (workflowStatus === "1") {
+            return (
+                <div>
+                    <h3>Add you're proposal</h3>
+                    <input className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" id="proposal-description" type="text" placeholder="Description..." />
+                    <button onClick={addProposal}>Validate</button>
+                    {(event === null ? "" : <p>Proposal id {event} just recorded</p>)}
+                </div>
+            )
+        }
+        return <h3>The proposal session is finished or not yet open</h3>
+    }
+
+    function inputAddProposal() {
+        if (isRegistered) {
+            return (
+                <div>
+                    <AddProposal />
+                </div>
+            )
+        }
     }
 
     return (
         <div>
-            <h1>Voting DApp, contract {contractAddress}</h1>
-            <h2>Your address is {account}</h2>
-            <div className="container">
-
+            <div className="window">
+                <h2>Voter - {(isRegistered ? "you are registered" : "you are not registered")}</h2>
             </div>
 
-            <div className="container">
-                <h3>Get voter</h3>
-                <div>
-                    <input id="voter-address" type="text" placeholder="0x..." />
-                    <button onClick={getVoterFromAddress}>Validate</button>
-                </div>
+            <div className="window">
+                {inputAddProposal()}
             </div>
-
-            <div className="container">
-                <h3>You're proposal</h3>
-                <input id="proposal-description" type="text" placeholder="Description..." />
-                <button onClick={addProposal}>Validate</button>
-            </div>
+            <Voting userAccount={props.userAccount} contract={props.contract}/>
         </div>
+        
     )
 }
 

@@ -1,99 +1,67 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-function Owner(props) {
-    const [contract, setContract] = useState(props.contract);
-    const [status, setStatus] = useState(null);
-    const [workflowStatusEvent, setworkflowStatusEvent] = useState(null);
+function WorkflowStatus(props) {
+    const [stringStatus, setStringStatus] = useState("Registering voters");
+    const [contract, setContract] = useState(null);
+    const [status, setStatus] = useState(0);
 
     useEffect(() => {
         setContract(props.contract);
-        getStatus();
-    });
+        updateStatus();
+    },[props.contract]);
 
-    async function getStatus() {
+    // Je veux récupérer le workflowstatus actuel
+    if (contract) {
+        contract.events.WorkflowStatusChange({ fromBlock: "latest" }) 
+        .on('data', event => {
+            console.log(event)
+            let newStatus = event.returnValues.newStatus;
+            setStatus(newStatus);
+            stringStatusFromId(newStatus)
+        })
+    }
+
+    async function updateStatus() {
         if (contract) {
-            const status = await contract.methods.workflowStatus().call({ from: props.address });
-            setStatus(status);
+            const statusId = await contract.methods.workflowStatus().call({ from: props.userAccount });
+            setStatus(statusId);
+            stringStatusFromId(statusId)
         }
     }
 
-    function updatePreviousNextStatusInFront(transaction) {
-        const workflowStatus = [
-            transaction.events.WorkflowStatusChange.returnValues.previousStatus,
-            transaction.events.WorkflowStatusChange.returnValues.newStatus
-        ];
-        setworkflowStatusEvent(workflowStatus);
-    }
-
-    async function startProposalsRegistering() {
-        try {
-            const transaction = await contract.methods.startProposalsRegistering().send({ from: props.address });
-            updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.address });
-            setStatus(status);
-        } catch (error) {
-            console.log(error);
+    function stringStatusFromId(id) {
+        switch (id) {
+            case "0":
+                setStringStatus("Registering voters");
+                break;
+            case "1":
+                setStringStatus("Proposals registration started");
+                break;
+            case "2":
+                setStringStatus("Proposals registration ended");
+                break;
+            case "3":
+                setStringStatus("Voting session started");
+                break;
+            case "4":
+                setStringStatus("Voting session ended");
+                break;
+            case "5":
+                setStringStatus("Votes tallied");
+                break;
+            default:
+                setStringStatus("Status error");
         }
     }
 
-    async function endProposalsRegistering() {
-        try {
-            const transaction = await contract.methods.endProposalsRegistering().send({ from: props.address });
-            updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.address });
-            setStatus(status);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    async function startVotingSession() {
-        try {
-            const transaction = await contract.methods.startVotingSession().send({ from: props.address });
-            updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.address });
-            setStatus(status);
-        } catch (error) {
-            console.log(error);
-        } 
-    }
-
-    async function endVotingSession() {
-        try {
-            const transaction = await contract.methods.endVotingSession().send({ from: props.address });
-            updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.address });
-            setStatus(status);
-        } catch (error) {
-            console.log(error);
-        } 
-    }
-
-    async function tallyVotes() {
-        try {
-            const transaction = await contract.methods.tallyVotes().send({ from: props.address });
-            updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.address });
-            setStatus(status);
-        } catch (error) {
-            console.log(error);
-        } 
-    }
- 
+    window.onload = updateStatus();
+    
     return (
-        <div className="container">
-            <h3>Workflow status : {status}</h3>
-            <ul>
-                <li>Previous status : {workflowStatusEvent == null ? "" : workflowStatusEvent[0]}</li>
-                <li>New status : {workflowStatusEvent == null ? "" : workflowStatusEvent[1]}</li>
-            </ul>
-            <button onClick={startProposalsRegistering}>1 - Start proposals registering</button>
-            <button onClick={endProposalsRegistering}>2 - End proposals registering</button>
-            <button onClick={startVotingSession}>3 - Start voting session</button>
-            <button onClick={endVotingSession}>4 - End voting session</button>
-            <button onClick={tallyVotes}>5 - Tally votes</button>
+        <div>
+            <hr/>
+            <h3>Workflowstatus {status} : {stringStatus}</h3>
         </div>
     )
 }
 
-export default Owner;
+export default WorkflowStatus;
