@@ -1,45 +1,37 @@
-.App {
-  text-align: center;
+body { background-color: rgb(29, 29, 197); }
+
+.header { 
+    width: 100%; 
+    margin: auto; 
+    margin-top: 4px;
+    border: 1px double rgb(0, 0, 0);
+    background-color: rgb(214, 38, 38); 
+    box-shadow: 0 0 0 4px rgb(214, 38, 38), 10px 10px 0px black;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
 
-.App-logo {
-  height: 40vmin;
+.header h3 { text-align: center; }
+h2 { text-align: center; margin: 5px; }
+h3 { margin: 5px 0; }
+nav { width: 100%; text-align: center; }
+nav > a { color: rgb(0, 0, 0); font-weight: bold; text-decoration: none; padding: 5px; }
+nav > a:hover { background-color: rgb(238, 238, 238); }
+hr { border: 1px solid black }
+
+.wrapper { width: 80%; margin: auto; display: flex; flex-direction: column; }
+
+.window { 
+    margin: 25px; 
+    padding: 15px; 
+    border: 1px double rgb(0, 0, 0);
+    background-color: rgb(238, 238, 238); 
+    box-shadow: 0 0 0 4px rgb(238, 238, 238), 15px 15px 0px black;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
+.alert { box-shadow: 0 0 0 4px rgb(255, 0, 0), 15px 15px 0px black; }
 
-.App-link {
-  color: #09d3ac;
-}
-
-td{
- border: solid 1px black;
-}
-table{
-  margin: 0 auto;
-  border: solid 10px rgb(209, 100, 122);
-}
-
-/* My components tests */
-
-body {
-  color: white;
-  background-color: #516489;
-}
-
-
-
-.header {
-  display: flex;
-  justify-content: space-around;
-  padding: 20px;
-}
+.form { width: 50%; margin: auto; display: flex; flex-direction: column; }
+input { width: 50%; }
+button:hover { background-color: rgb(185, 185, 185); }
