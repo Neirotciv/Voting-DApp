@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import VotingContract from "./contracts/Voting.json";
 import getWeb3 from "./scripts/getWeb3";
-// import Voter from "./components/Voter";
-// import Owner from "./components/Owner";
 
 import "./App.css";
 
@@ -21,7 +19,7 @@ function WorkflowStatus(props) {
     async function updateStatus() {
         if (contract) {
             const statusId = await contract.methods.workflowStatus().call({ from: props.userAccount });
-            stringStatusFromId(statusId)
+            stringStatusFromId(statusId);
         }
     }
 
@@ -211,6 +209,10 @@ function Header(props) {
 // ===========================
 
 function Owner(props) {
+    const contract = useContext(ContractContext);
+    
+    // contract.getPastEvents(event[, options][, callback])
+
     return (
         <div>
             <h1>Owner</h1>
