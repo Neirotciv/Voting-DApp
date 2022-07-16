@@ -11,17 +11,19 @@ import "./App.css";
 // ====================================
 
 function WorkflowStatus(props) {
-    const [status, setStatus] = useState(0);
     const [stringStatus, setStringStatus] = useState("Registering voters");
     const contract = useContext(ContractContext);
 
-    async function updateStatus() {
-        if (contract) {
-            const statusId = await contract.methods.workflowStatus().call({ from: props.userAccount });
-            setStatus(statusId);
-            stringStatusFromId(statusId)
+    useEffect(() => {
+        async function updateStatus() {
+            if (contract) {
+                const statusId = await contract.methods.workflowStatus().call({ from: props.userAccount });
+                stringStatusFromId(statusId)
+            }
         }
-    }
+        updateStatus();
+    },[contract, props.userAccount]);
+
     function stringStatusFromId(id) {
         switch (id) {
             case "0":
@@ -47,7 +49,7 @@ function WorkflowStatus(props) {
         }
     }
 
-    window.onload = updateStatus();
+    // window.onload = updateStatus();
     
     return (
         <div>
@@ -171,7 +173,7 @@ function AddVoter(props) {
         try {
             // Récupérer l'évenement dans la transaction
             transaction = await contract.methods.addVoter(voterToAdd).send({ from: props.userAccount });
-            const event = transaction.events.VoterRegistered.returnValues.voterAddress
+            const event = transaction.events.VoterRegistered.returnValues.voterAddress;
             setEvent(event);
             console.log(event);
         } catch (error) {
@@ -226,13 +228,13 @@ function Voter(props) {
     const contract = useContext(ContractContext);
 
     useEffect(() => {
-        getVoterFromAddress();
-    })
+        checkIfUserIsRegistered();
+    },[])
 
-    async function getVoterFromAddress() {
+    async function checkIfUserIsRegistered() {
         if (contract && props.userAccount) {
             const transaction = await contract.methods.getVoter(props.userAccount).call({ from: props.userAccount });
-            setIsRegistered(transaction.isRegistered)
+            setIsRegistered(transaction.isRegistered);
         }
     }
 
@@ -269,6 +271,14 @@ function Voter(props) {
     )
 }
 
+function Voting() {
+    return (
+        <div>
+            <h3>Voting</h3>
+        </div>
+    )
+}
+
 // =========================
 // ---------- APP ----------
 // =========================
@@ -297,7 +307,8 @@ function App() {
                 );
                 const contractOwner = await instance.methods.owner().call();
                 const contractAddress = await instance.options.address;
-
+                
+                if (accounts[0] === contractOwner) { setIsOwner(true) }
                 setWeb3(web3Provider);
                 setContract(instance);
                 setAccounts(accounts);
@@ -305,7 +316,6 @@ function App() {
                 setContractAddress(contractAddress);
                 setUserAccount(accounts[0]);
 
-                if (accounts[0] === contractOwner) { setIsOwner(true) }
                 
             } catch (error) {
                 alert("Failed to load web3, accounts, or contract. Check console for details");
@@ -317,8 +327,7 @@ function App() {
     },[]);
 
     function UserDashboard(props) {
-
-        if (props.isOwner) {
+        if (isOwner) {
             return <Owner userAccount={props.userAccount} />;
         }
         return <Voter userAccount={props.userAccount} />;
