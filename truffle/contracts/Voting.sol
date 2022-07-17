@@ -38,7 +38,7 @@ contract Voting is Ownable {
 
     event VoterRegistered(address voterAddress); 
     event WorkflowStatusChange(WorkflowStatus previousStatus, WorkflowStatus newStatus);
-    event ProposalRegistered(uint proposalId);
+    event ProposalRegistered(uint proposalId, string proposal);
     event Voted (address voter, uint proposalId);
 
     modifier onlyVoters() {
@@ -85,7 +85,7 @@ contract Voting is Ownable {
     /// @dev onlyVoters modifier, a person must be registered as a voter to use the feature
     /// @param _desc The description of the proposal
     /// @custom:emit The id of the registered proposal
-    /// @custom:require proposal is not empty and proposal session is open, the proposal array is also limited to 100
+    /// @custom:require proposal is not empty and proposal session is open, the proposal array is also limited to 100 for preventing Dos attack
     function addProposal(string memory _desc) external onlyVoters {
         require(workflowStatus == WorkflowStatus.ProposalsRegistrationStarted, 'Proposals are not allowed yet');
         require(keccak256(abi.encode(_desc)) != keccak256(abi.encode("")), 'Vous ne pouvez pas ne rien proposer'); // facultatif
@@ -95,7 +95,7 @@ contract Voting is Ownable {
         Proposal memory proposal;
         proposal.description = _desc;
         proposalsArray.push(proposal);
-        emit ProposalRegistered(proposalsArray.length-1);
+        emit ProposalRegistered(proposalsArray.length-1, _desc);
     }
 
     // ::::::::::::: VOTE ::::::::::::: //
