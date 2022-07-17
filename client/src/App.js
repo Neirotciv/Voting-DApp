@@ -4,22 +4,18 @@ import getWeb3 from "./scripts/getWeb3";
 import Voter from "./components/Voter";
 import AddVoter from "./components/AddVoter";
 import Header from "./components/Header";
+import Proposals from "./components/Proposals";
+
 // import Owner from "./components/Owner";
 
 // Eléments de notation
 
 // Revoir le code sol pour enlever la faille de sécurité, ajouter les commentaires et les
 // éléments de bonnes pratiques
-// (si vous n'utilisez pas le code proposé en correction, veuillez faire attention à la
-// sécurité, aux optimisations, aux commentaires, aux bonnes pratiques...)
 // avoir une application décentralisée qui permet d'appeler toutes les fonctions
 // faire une vidéo du workflow
-// une utilisation d'event
-// afficher le compte utilisé, et les proposals
 
 // déployer l'application sur serveur public
-// un affichage adapté au compte utilisé,
-// utiliser au moins un composant utile (pas juste l'adresse)
 
 import "./App.css";
 
@@ -28,15 +24,12 @@ import "./App.css";
 // ====================================
 
 function ChangeWorkflowStatus(props) {
-    const [status, setStatus] = useState(null);
     const contract = useContext(ContractContext);
     const [workflowStatusEvent, setworkflowStatusEvent] = useState(null);
     const [winningProposal, setWinningProposal] = useState(null);
    
     async function updateStatus() {
         if (contract) {
-            const status = await contract.methods.workflowStatus().call({ from: props.userAccount });
-            setStatus(status);
             const winningProposalID = await contract.methods.winningProposalID().call({ from: props.userAccount });
             setWinningProposal(winningProposalID);
         }
@@ -49,6 +42,7 @@ function ChangeWorkflowStatus(props) {
             transaction.events.WorkflowStatusChange.returnValues.previousStatus,
             transaction.events.WorkflowStatusChange.returnValues.newStatus
         ];
+        console.log(workflowStatus);
         setworkflowStatusEvent(workflowStatus);
     }
 
@@ -56,10 +50,8 @@ function ChangeWorkflowStatus(props) {
         try {
             const transaction = await contract.methods.startProposalsRegistering().send({ from: props.userAccount });
             updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.userAccount });
-            updateStatus(status);
         } catch (error) {
-            console.log(error);
+            console.error("start proposals registering", error);
         }
     }
 
@@ -67,8 +59,6 @@ function ChangeWorkflowStatus(props) {
         try {
             const transaction = await contract.methods.endProposalsRegistering().send({ from: props.userAccount });
             updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.userAccount });
-            updateStatus(status);
         } catch (error) {
             console.log(error);
         }
@@ -78,8 +68,6 @@ function ChangeWorkflowStatus(props) {
         try {
             const transaction = await contract.methods.startVotingSession().send({ from: props.userAccount });
             updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.userAccount });
-            updateStatus(status);
         } catch (error) {
             console.log(error);
         } 
@@ -89,8 +77,6 @@ function ChangeWorkflowStatus(props) {
         try {
             const transaction = await contract.methods.endVotingSession().send({ from: props.userAccount });
             updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.userAccount });
-            updateStatus(status);
         } catch (error) {
             console.log(error);
         } 
@@ -99,11 +85,9 @@ function ChangeWorkflowStatus(props) {
     async function tallyVotes() {
         try {
             const transaction = await contract.methods.tallyVotes().send({ from: props.userAccount });
-            // updatePreviousNextStatusInFront(transaction);
-            const status = await contract.methods.workflowStatus().call({ from: props.userAccount });
+            updatePreviousNextStatusInFront(transaction);
             const winningProposalID = await contract.methods.winningProposalID().call({ from: props.userAccount });
             setWinningProposal(winningProposalID);
-            updateStatus(status);
         } catch (error) {
             console.log(error);
         } 
@@ -111,7 +95,6 @@ function ChangeWorkflowStatus(props) {
 
     return (
         <div className="window">
-            <div>Workflow status id : {status}</div>
             <div>Previous status : </div>
             <div>New status : </div><br/>
             <div>Winner is {winningProposal}</div>
@@ -123,7 +106,6 @@ function ChangeWorkflowStatus(props) {
                 <button onClick={endVotingSession}>4 - End voting session</button>
                 <button onClick={tallyVotes}>5 - Tally votes</button> 
             </div>
-           
         </div>
     )
 }
@@ -140,6 +122,7 @@ function Owner(props) {
             </div>
             <ChangeWorkflowStatus userAccount={props.userAccount} />
             <AddVoter userAccount={props.userAccount} contract={props.contract} />
+            <Proposals contract={props.contract} />
         </div>
     )
 }

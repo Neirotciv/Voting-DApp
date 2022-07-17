@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Voters from "./Voters";
 
 function AddVoter(props) {
     const [event, setEvent] = useState(null);
@@ -31,6 +32,7 @@ function AddVoter(props) {
             <input id="new-voter-address" type="text" placeholder="address 0x..." />
             <button onClick={addNewVoter}>Validate</button>
             {(event === null ? "" : <p>{event} just recorded</p>)}
+            <Voters contract={props.contract} />
         </div>
     )
 }
