@@ -6,15 +6,8 @@ import AddVoter from "./components/AddVoter";
 import Header from "./components/Header";
 import Proposals from "./components/Proposals";
 
-// import Owner from "./components/Owner";
-
-// Eléments de notation
-
-// Revoir le code sol pour enlever la faille de sécurité, ajouter les commentaires et les
-// éléments de bonnes pratiques
 // avoir une application décentralisée qui permet d'appeler toutes les fonctions
 // faire une vidéo du workflow
-
 // déployer l'application sur serveur public
 
 import "./App.css";

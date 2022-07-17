@@ -31,6 +31,7 @@ hr { border: 1px solid black }
 }
 
 .alert { box-shadow: 0 0 0 4px rgb(255, 0, 0), 15px 15px 0px black; }
+.good { background-color: rgb(43, 199, 25); box-shadow: 6px 6px 0px black; margin-bottom: 15px; padding: 5px; }
 
 .form { width: 50%; margin: auto; display: flex; flex-direction: column; }
 input { width: 50%; }

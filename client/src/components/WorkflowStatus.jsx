@@ -16,7 +16,7 @@ function WorkflowStatus(props) {
         .on('data', event => {
             let newStatus = event.returnValues.newStatus;
             setStatus(newStatus);
-            stringStatusFromId(newStatus)
+            stringStatusFromId(newStatus);
         })
     }
 
@@ -24,7 +24,7 @@ function WorkflowStatus(props) {
         if (contract) {
             const statusId = await contract.methods.workflowStatus().call({ from: props.userAccount });
             setStatus(statusId);
-            stringStatusFromId(statusId)
+            stringStatusFromId(statusId);
         }
     }
 
