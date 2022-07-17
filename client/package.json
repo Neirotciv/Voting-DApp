@@ -6,6 +6,11 @@
     "node": "16.x",
     "npm": "8.x"
   },
+  "buildpacks": [
+    {
+      "url": "mars/create-react-app"
+    }
+  ],
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
