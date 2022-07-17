@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Voting from "./Voting";
 import Proposals from "./Proposals";
-import Winning from "./Winning";
 
 function Voter(props) {
     const [isRegistered, setIsRegistered] = useState(false);
     const [workflowStatus, setworkflowStatus] = useState(0);
     const [contract, setContract] = useState(props.contract);
-    const [event, setEvent] = useState(null);
+    const [id, setId] = useState(null);
 
     useEffect(() => {
         setContract(props.contract);
@@ -50,8 +49,8 @@ function Voter(props) {
         const description = element.value;
         try {
             const transaction = await contract.methods.addProposal(description).send({ from: props.userAccount });
-            const event = transaction.events.ProposalRegistered.returnValues.proposalId;
-            setEvent(event);
+            const idEvent = transaction.events.ProposalRegistered.returnValues.proposalId;
+            setId(idEvent);
         } catch (error) {
             console.log("add proposal", error)
         }
@@ -62,20 +61,21 @@ function Voter(props) {
             return (
                 <div className="window">
                     <h3>Add you're proposal</h3>
-                    <input className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" id="proposal-description" type="text" placeholder="Description..." />
+                    <input id="proposal-description" type="text" placeholder="Description..." />
                     <button onClick={addProposal}>Validate</button>
-                    {(event === null ? "" : <p>Proposal id {event} just recorded</p>)}
+                    {(id === null ? "" : <p className="good">Proposal id {id} just recorded</p>)}
                 </div>
             )
         }
         return <div className="window"><h3>The proposal session is finished or not yet open</h3></div>
     }
 
-    function inputAddProposal() {
+    function inputIfRegistered() {
         if (isRegistered) {
             return (
                 <div>
-                    <AddProposal />
+                    <AddProposal isRegistered={isRegistered} />
+                    {workflowStatus === "3" ? <Voting userAccount={props.userAccount} contract={props.contract} /> : "" }
                 </div>
             )
         }
@@ -86,9 +86,7 @@ function Voter(props) {
             <div className="window">
                 <h2>Voter - {(isRegistered ? "you are registered" : "you are not registered")}</h2>
             </div>
-            {inputAddProposal()}
-            <Winning userAccount={props.userAccount} workflowStatus={workflowStatus} contract={props.contract} />
-            <Voting userAccount={props.userAccount} contract={props.contract} />
+            {inputIfRegistered()}
             <Proposals contract={props.contract} />
         </div>
         

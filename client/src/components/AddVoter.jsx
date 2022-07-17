@@ -4,6 +4,7 @@ import Voters from "./Voters";
 function AddVoter(props) {
     const [event, setEvent] = useState(null);
     const [contract, setContract] = useState(props.contract);
+    const [newVoter, setNewVoter] = useState(null)
 
     useEffect(() => {
         setContract(props.contract);
@@ -12,6 +13,7 @@ function AddVoter(props) {
     async function addNewVoter() {
         const element = document.getElementById("new-voter-address");
         const voterToAdd = element.value;
+        setNewVoter(voterToAdd);
         let transaction;
 
         try {
@@ -28,11 +30,11 @@ function AddVoter(props) {
 
     return (
         <div className="window">
-            <h3>Add new voter</h3>
+            <h3>Add new voter <em>(only in registering voters session)</em></h3>
             <input id="new-voter-address" type="text" placeholder="address 0x..." />
             <button onClick={addNewVoter}>Validate</button>
-            {(event === null ? "" : <p>{event} just recorded</p>)}
-            <Voters contract={props.contract} />
+            {(event === null ? "" : <p className="good">{event} just recorded</p>)}
+            <Voters contract={props.contract} newVoter={newVoter} />
         </div>
     )
 }

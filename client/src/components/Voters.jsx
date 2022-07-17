@@ -10,18 +10,17 @@ function Voters(props) {
                 fromBlock: 0,
                 toBlock: "latest"
             }
-            const addresses = await contract.getPastEvents("VoterRegistered", options);
+            const addressesEvent = await contract.getPastEvents("VoterRegistered", options);
+            const addresses = addressesEvent.map(event => event.returnValues.voterAddress);
             setVotersAddress(addresses);
         }
 
         updateVotersList();
     },[]);
 
-    contract.events.VoterRegistered({ fromBlock: "latest" })
-        .on('data', event => {
-            votersAddress.push(event);
-            setVotersAddress(votersAddress);
-        });
+    useEffect(() => {
+        votersAddress.push(props.newVoter);
+    },[props.newVoter])
 
     return (
         <div>
@@ -31,9 +30,9 @@ function Voters(props) {
                     <tr>
                         <td>Address</td>
                     </tr>
-                    {votersAddress.map(element => (
-                        <tr key={element.returnValues.voterAddress}>
-                            <td>{element.returnValues.voterAddress}</td>
+                    {votersAddress.map(address => (
+                        <tr key={address}>
+                            <td>{address}</td>
                         </tr>
                     ))}
                 </tbody>

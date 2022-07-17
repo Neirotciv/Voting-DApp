@@ -32,7 +32,7 @@ function Voting(props) {
 
     return (
         <div className="window">
-            <h3>Voting - /!\ Faire apparaitre dans la bonne session</h3>
+            <h3>Voting</h3>
             <input id="vote-proposal-id" type="text" placeholder="Proposal id" />
             <button onClick={voteForProposal}>Validate</button>
             <Message />
