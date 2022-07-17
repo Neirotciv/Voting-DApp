@@ -34,4 +34,8 @@ hr { border: 1px solid black }
 
 .form { width: 50%; margin: auto; display: flex; flex-direction: column; }
 input { width: 50%; }
+button { margin: 2px; }
 button:hover { background-color: rgb(185, 185, 185); }
+
+table { margin: auto; width: 100%; }
+table, tr, td { border: 1px solid black; border-collapse: collapse }

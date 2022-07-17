@@ -14,7 +14,6 @@ function WorkflowStatus(props) {
     if (contract) {
         contract.events.WorkflowStatusChange({ fromBlock: "latest" }) 
         .on('data', event => {
-            console.log(event)
             let newStatus = event.returnValues.newStatus;
             setStatus(newStatus);
             stringStatusFromId(newStatus)
