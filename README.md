@@ -16,4 +16,4 @@ Le contrat est déployé sur le testnet Ropsten à l'adresse : [0x03F1F7569cE9aE
 
 Hebergé sur Heroku : https://shielded-coast-66343.herokuapp.com/
 
-Présentation en vidéo : [A venir](https://www.loom.com/share/2e231f64220d4e39945bd74f852b57d9)
+Présentation en vidéo : [Présentation](https://www.loom.com/share/2e231f64220d4e39945bd74f852b57d9)
