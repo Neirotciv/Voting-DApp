@@ -16,4 +16,23 @@ Le contrat est déployé sur le testnet Ropsten à l'adresse : [0x03F1F7569cE9aE
 
 Hebergé sur Heroku : https://shielded-coast-66343.herokuapp.com/
 
-Présentation en vidéo : [Présentation](https://www.loom.com/share/2e231f64220d4e39945bd74f852b57d9)
+Présentation en vidéo : https://www.loom.com/share/2e231f64220d4e39945bd74f852b57d9
+
+## Modifications apportées
+Le contrat a été modifié pour être protégé du Dos gas limit.
+
+J'ai rajouté un require limitant l'ajout de propopositions à 100. De ce fait un attaquant ne pourrait plus remplir un tableau de propositions justqu'à ce qu'il ne soit plus possible de boucler dessus.
+```javascript
+  function addProposal(string memory _desc) external onlyVoters {
+    require(workflowStatus == WorkflowStatus.ProposalsRegistrationStarted, 'Proposals are not allowed yet');
+    require(keccak256(abi.encode(_desc)) != keccak256(abi.encode("")), 'Vous ne pouvez pas ne rien proposer'); // facultatif
+    require(proposalsArray.length <= 100, "The limit of proposals has been reached"); // Dos protection
+    // voir que desc est different des autres
+
+    Proposal memory proposal;
+    proposal.description = _desc;
+    proposalsArray.push(proposal);
+    emit ProposalRegistered(proposalsArray.length-1, _desc);
+  }
+
+```
