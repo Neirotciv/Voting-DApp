@@ -5,6 +5,7 @@ import Voter from "./components/Voter";
 import AddVoter from "./components/AddVoter";
 import Header from "./components/Header";
 import Proposals from "./components/Proposals";
+// import Winning from "./components/Proposals";
 
 // avoir une application décentralisée qui permet d'appeler toutes les fonctions
 // faire une vidéo du workflow
@@ -18,7 +19,7 @@ import "./App.css";
 
 function ChangeWorkflowStatus(props) {
     const contract = useContext(ContractContext);
-    const [workflowStatusEvent, setworkflowStatusEvent] = useState(null);
+    const [workflowStatusEvent, setworkflowStatusEvent] = useState([0, 0]);
     const [winningProposal, setWinningProposal] = useState(null);
    
     async function updateStatus() {
@@ -88,9 +89,8 @@ function ChangeWorkflowStatus(props) {
 
     return (
         <div className="window">
-            <div>Previous status : </div>
-            <div>New status : </div><br/>
-            <div>Winner is {winningProposal}</div>
+            <h3>Previous status : {workflowStatusEvent[0]} - New status : {workflowStatusEvent[1]}</h3>
+            <h3>Winner is {winningProposal}</h3>
             
             <div className="form">
                 <button onClick={startProposalsRegistering}>1 - Start proposals registering</button>

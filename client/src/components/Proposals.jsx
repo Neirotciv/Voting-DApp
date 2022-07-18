@@ -42,13 +42,13 @@ function Proposals(props) {
                     <tr>
                         <td><strong>Id</strong></td>
                         <td><strong>Description</strong></td>
-                        <td><strong>Vote</strong></td>
+                        {/* <td><strong>Vote</strong></td> */}
                     </tr>
                     {proposals.map(proposal => (
                         <tr key={proposal.id}>
                             <td>{proposal.id}</td>
                             <td>{proposal.description}</td>
-                            <td>{proposal.vote}</td>
+                            {/* <td>{proposal.vote}</td> */}
                         </tr>
                     ))}
                 </tbody>
