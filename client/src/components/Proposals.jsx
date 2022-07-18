@@ -48,7 +48,7 @@ function Proposals(props) {
                         <tr key={proposal.id}>
                             <td>{proposal.id}</td>
                             <td>{proposal.description}</td>
-                            <td>{proposal.vote}</td>
+                            {/* <td>{proposal.vote}</td> */}
                         </tr>
                     ))}
                 </tbody>
