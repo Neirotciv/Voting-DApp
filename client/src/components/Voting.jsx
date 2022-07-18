@@ -14,8 +14,9 @@ function Voting(props) {
         const id = element.value;
         try {
             const transaction = await contract.methods.setVote(id).send({ from: props.userAccount });
-            setVoterAddress(transaction.events.Voted.voter);
-            setProposalId(transaction.events.Voted.proposalId);
+            console.log(transaction)
+            setVoterAddress(transaction.events.Voted.returnValues.voter);
+            setProposalId(transaction.events.Voted.returnValues.proposalId);
         } catch (error) {
             console.log("vote for proposal", error);
         }
@@ -23,9 +24,11 @@ function Voting(props) {
     }
 
     function Message() {
+        console.log(voterAddress)
+        console.log(proposalId)
         if (voterAddress && proposalId) {
             return (
-                <p>{voterAddress} has vote for proposal {proposalId}</p>
+                <p className="good">{voterAddress} has vote for proposal {proposalId}</p>
             )
         }
     }
